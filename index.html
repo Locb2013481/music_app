@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music app loc</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+        integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div class="player ">
+        <!-- Dashboard -->
+        
+        <div class="dashboard">
+            <!-- Header -->
+            <header>
+                <h4>Now playing:</h4>
+                <h2>String 57th & 9th</h2>
+            </header>
+
+            <!-- CD -->
+            <div class="cd">
+                <div class="cd-thumb" style="background-image: url('./assets/img/pic1.jpg')">
+                </div>
+            </div>
+
+            <!-- Control -->
+            <div class="control">
+                <div class="btn btn-repeat">
+                    <i class="fas fa-redo"></i>
+                </div>
+                <div class="btn btn-prev">
+                    <i class="fas fa-step-backward"></i>
+                </div>
+                <div class="btn btn-toggle-play">
+                    <i class="fas fa-pause icon-pause"></i>
+                    <i class="fas fa-play icon-play"></i>
+                </div>
+                <div class="btn btn-next">
+                    <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="btn btn-random">
+                    <i class="fas fa-random"></i>
+                </div>
+            </div>
+
+            <div class="control--sound">
+                <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+                <input type="range" class="volumeSlider" min="0" max="100" value="0"> <span id="display">0</span>
+            </div>
+            <audio id="audio" src=""></audio>
+            
+            <!-- Playlist -->
+
+        </div>
+        <div class="playlist">
+        </div>
+        <div class="crollTop"><i class="fa-sharp fa-solid fa-arrow-up"></i></div>
+
+        <script>
+            const $ = document.querySelector.bind(document);
+            const $$ = document.querySelectorAll.bind(document);
+
+            const PlAYER_STORAGE_KEY = "F8_PLAYER";
+
+            const player = $('.player')
+            const heading = $('header h2')
+            const cdThumb = $('.cd-thumb')
+            const audio = $('#audio')
+            const progress = $('#progress')
+            const vollum = $('.volumeSlider')
+
+            const playBtn = $('.btn-toggle-play')
+            const nextBtn = $('.btn-next')
+            const prevBtn = $('.btn-prev')
+            const randomBtn = $('.btn-random')
+            const repeatBtn = $('.btn-repeat')
+            const playList = $('.playlist')
+            const scrollToTopBtn = $('.crollTop')
+            const displayVolume = $('#display')
+            const app = {
+                songs: [
+                    {
+                        name: "Anh là của em",
+                        singer: "karid",
+                        path: "./assets/music/song1.mp3",
+                        image: "./assets/img/pic1.jpg"
+                    },
+                    {
+                        name: "Khuôn mặt đáng thương",
+                        singer: "Sơn Tùng mtp",
+                        path: "./assets/music/song2.mp3",
+                        image: "./assets/img/pic3.jpg"
+                    },
+                    {
+                        name: "Cơn mưa ngang qua",
+                        singer: "Sơn Tùng mtp",
+                        path: "./assets/music/song3.mp3",
+                        image: "./assets/img/pic2.jpg"
+                    },
+                    {
+                        name: "HongKong1",
+                        singer: "Nguyen Anh cover",
+                        path: "./assets/music/song4.mp3",
+                        image: "./assets/img/pic4.jpg"
+                    },
+                    {
+                        name: "Click Pow Get Down",
+                        singer: "Raftaar x Fortnite",
+                        path: "./assets/music/song5.mp3",
+                        image: "./assets/img/pic5.jpg"
+                    },
+                    {
+                        name: "Lạc trôi",
+                        singer: "Sơn Tùng mtp",
+                        path: "./assets/music/song6.mp3",
+                        image: "./assets/img/pic6.jpg"
+                    },
+                    {
+                        name: "Nhạc vui không biết tên",
+                        singer: "Raftaar x Fortnite",
+                        path: "./assets/music/song7.mp3",
+                        image: "./assets/img/pic7.jpg"
+                    },
+                    {
+                        name: "Nhạc hơi buồn",
+                        singer: "Raftaar x Fortnite",
+                        path: "./assets/music/song8.mp3",
+                        image: "./assets/img/pic8.jpg"
+                    },
+                    {
+                        name: "Nhạc không lời vui",
+                        singer: "Raftaar x Fortnite",
+                        path: "./assets/music/song9.mp3",
+                        image: "./assets/img/pic9.jpg"
+                    },
+                    {
+                        name: "Yêu không nghỉ phép",
+                        singer: "isaac",
+                        path: "./assets/music/song10.mp3",
+                        image: "./assets/img/pic10.jpg"
+                    }
+                ],
+                currentIndex: 0,
+                isPlaying: false,
+                isRandom: false,
+                isRepeat:false,
+                config:{},
+                config: JSON.parse(localStorage.getItem(PlAYER_STORAGE_KEY)) || {},
+                setConfig: function (key, value) {
+                    this.config[key] = value
+                    localStorage.setItem(PlAYER_STORAGE_KEY, JSON.stringify(this.config));
+                },
+                render() {
+                    const htmls = this.songs.map(function (song,index) {
+                        return `   
+                        <div class="song ${index===app.currentIndex?'active':''}" data-index="${index}">
+                            <div class="thumb"
+                                style="background-image: url('${song.image}')">
+                            </div>
+                            <div class="body">
+                                <h3 class="title">${song.name}</h3>
+                                <p class="author">${song.singer}</p>
+                            </div>
+                            <div class="option">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </div>
+                        </div> 
+                        `
+                    });
+                    //gan cho mang ben tren
+                    playList.innerHTML = htmls.join('');
+                    
+                },
+
+                defineProperties() {
+                    Object.defineProperty(this, "currentSong", {
+                        get() {
+                            return this.songs[this.currentIndex]
+                        }
+                    })
+                },
+
+                //xu ly su kien scroll
+                handleEvent() {
+                    const _this = this
+                    const cd = $('.cd')
+                    const cdWidth = cd.offsetWidth
+                    
+                    //xu ly dia cd quay/dung
+                    const cdThumbAnimate = cdThumb.animate([
+                        {transform: 'rotate(360deg)'}
+                    ],{
+                        duration: 10000 , //10giay
+                        iterations: Infinity
+                    })
+                    cdThumbAnimate.pause();
+
+                    //xu ly phong to thu nho dia cd
+                    document.onscroll = function () {
+                        const srcollTop = window.scrollY || document.documentElement.scrollTop
+                        const newCdWidth = cdWidth - srcollTop
+
+                        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0
+                        cd.style.opacity = newCdWidth / cdWidth
+                    }
+                    // xu ly khi click play
+                    playBtn.onclick = function () {
+                        if (_this.isPlaying) {
+                            audio.pause()
+                        } else {
+                            audio.play()
+                        }
+                    }
+
+                    //xy ly khi song duoc play
+                    audio.onplay = function () {
+                        _this.isPlaying = true
+                        player.classList.add('playing')
+                        cdThumbAnimate.play()
+                    }
+                    //xy ly khi song bi pause
+                    audio.onpause = function () {
+                        _this.isPlaying = false
+                        player.classList.remove('playing')
+                        cdThumbAnimate.pause()
+                    }
+
+                    //theo doi tien do bai hat
+                    audio.ontimeupdate = function () {
+                        if (audio.duration) {
+                            const progressPercent = Math.floor((audio.currentTime / audio.duration) * 100);
+                            progress.value = progressPercent;
+                        }
+                    }
+
+                    //xu ly khi tua audio
+                    progress.oninput = function(e) {
+                        const seekTime = audio.duration/100*e.target.value; //tinh ra thoi giay hien tai 
+                        audio.currentTime = seekTime
+                    }
+
+                    //xu ly am luong
+                    vollum.oninput=function(){
+                        
+                        displayVolume.textContent=vollum.value
+                        audio.volume = Number(vollum.value)/100
+                    }
+                    //xy ly next bai hat
+                    nextBtn.onclick = function(){
+                        if(_this.isRandom){
+                            _this.playRandomSong()
+                        }else{
+                            _this.nextSong()
+                        }
+                        audio.play()
+                        _this.render()
+                        _this.scrollToActiveSong()
+                    }
+                    //xy ly quay lai bai hat
+                    prevBtn.onclick = function(){
+                        if(_this.isRandom){
+                            _this.playRandomSong()
+                        }else{
+                            _this.prevSong()
+                        }
+                        audio.play()
+                        _this.render()
+                        _this.scrollToActiveSong()
+
+                    }
+                    //xy ly khi bat/tat nut random
+                    randomBtn.onclick = function(){
+                        _this.isRandom = !_this.isRandom
+                        _this.setConfig('isRandom',_this.isRandom)
+                        randomBtn.classList.toggle('active',_this.isRandom) // if isramdom dang false thi gan class active va nguoc lai
+                    }
+                    //xu ly next song khi ket thuc bai hat
+                    audio.onended=function(){
+                        if(_this.isRepeat){
+                            audio.play()
+                        }else{
+                            nextBtn.click()
+                        }
+                    }
+                    //xu ly thi repeat bai hat
+                    repeatBtn.onclick=function(){
+                        _this.isRepeat = !_this.isRepeat
+                        _this.setConfig('isRepeat',_this.isRepeat)
+                        repeatBtn.classList.toggle('active',_this.isRepeat) // if isrepeat dang false thi gan class active va nguoc lai
+                    }
+                    //xu ly click vao cac bai hat
+                    playList.onclick = function(e){
+                        const songNode = e.target.closest('.song:not(.active)')
+                        if(songNode || e.target.closest(".option")){
+                            if (songNode) {
+                                _this.currentIndex = Number(songNode.dataset.index);
+                                _this.loadCurrentSong();
+                                _this.render();
+                                audio.play();
+                            }
+                            
+                        }
+                    }
+                    //xu ly nut scroll to top
+                    scrollToTopBtn.onclick = function(){
+                        window.scrollTo(0,0)
+                    }
+                
+                },
+
+                //load nhac hien tai
+                loadCurrentSong() {
+                    heading.textContent = this.currentSong.name
+                    cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`
+                    audio.src = this.currentSong.path
+                },
+                
+                nextSong(){
+                    this.currentIndex++
+                    if(this.currentIndex >= this.songs.length)
+                        this.currentIndex = 0
+                    this.loadCurrentSong()
+                },
+                prevSong(){
+                    this.currentIndex--
+                    if(this.currentIndex < 0)
+                        this.currentIndex =this.songs.length
+                    this.loadCurrentSong()
+                },
+
+                playRandomSong(){
+                    let newIndex
+                    do{ //xu ly khong random trung bai hat dang hat
+                        newIndex = Math.floor(Math.random()*this.songs.length)
+                    }while(newIndex === this.currentIndex)
+                    this.currentIndex = newIndex
+                    this.loadCurrentSong()
+                },
+                
+                scrollToActiveSong(){
+                    setTimeout(function(){
+                        $('.song.active').scrollIntoView({
+                            behavior:'smooth',
+                            block:'center'
+                        })
+
+                    },100)
+                },
+
+                loadConfig(){
+                    this.isRandom = this.config.isRandom
+                    this.isRepeat = this.config.isRepeat
+                    
+                },
+                scrollToTop(){
+                    window.scrollTo(0,0)
+                },
+
+               
+                start() {
+                    
+                    //gan cau hinh tu config vao obj app
+                    this.loadConfig()
+                    //dinh nghia thuoc tinh obj
+                    this.defineProperties()
+
+                    //lang nghe xu ly cac su kien
+                    this.handleEvent()
+
+                    //tai thong tin bai hat dau tien vao ui khi run app
+                    this.loadCurrentSong()
+
+                    //render playlist
+                    this.render()
+                    
+                   
+                    //hien tri trang thai ban dau reandom va repeat
+                    randomBtn.classList.toggle('active',this.isRandom) 
+                    repeatBtn.classList.toggle('active',this.isRepeat)
+                }
+            };
+
+
+            app.start()
+        </script>
+</body>
+
+</html>
