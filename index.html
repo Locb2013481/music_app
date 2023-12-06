@@ -14,6 +14,7 @@
 </head>
 
 <body>
+   
     <div class="player ">
         <!-- Dashboard -->
         
@@ -60,7 +61,8 @@
 
         </div>
         <div class="playlist">
-        </div>
+        </div>  
+       
         <div class="crollTop"><i class="fa-sharp fa-solid fa-arrow-up"></i></div>
 
         <script>
@@ -108,7 +110,7 @@
                         name: "HongKong1",
                         singer: "Nguyen Anh cover",
                         path: "./assets/music/song4.mp3",
-                        image: "./assets/img/pic4.jpg"
+                        image: "./assets/img/pic4.JPG"
                     },
                     {
                         name: "Click Pow Get Down",
@@ -247,8 +249,7 @@
                     }
 
                     //xu ly am luong
-                    vollum.oninput=function(){
-                        
+                    vollum.oninput=function(){               
                         displayVolume.textContent=vollum.value
                         audio.volume = Number(vollum.value)/100
                     }
